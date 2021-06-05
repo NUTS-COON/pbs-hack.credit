@@ -1,0 +1,58 @@
+buildscript {
+    ext.kotlin_version = "1.5.10"
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:4.2.1"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:latest.release"
+    }
+}
+
+allprojects {
+    apply plugin: 'com.jfrog.artifactory'
+    apply plugin: 'maven-publish'
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+project(':psb:credit') {
+    artifactoryPublish.dependsOn('build')
+    publishing {
+        publications {
+            aar(MavenPublication) {
+                groupId 'ru.nutscoon.psb'
+                artifactId 'credit'
+                version '1.0.0'
+                artifact("$buildDir/outputs/aar/${project.getName()}-debug.aar")
+            }
+        }
+    }
+
+    artifactoryPublish {
+        publications(publishing.publications.aar)
+    }
+}
+
+artifactory {
+    contextUrl = 'https://nutscoon.jfrog.io/artifactory'
+    publish {
+        repository {
+            repoKey = 'default-maven-local'
+            username = ""
+            password = ""
+        }
+        defaults {
+            publishArtifacts = true
+            publishPom = true
+        }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

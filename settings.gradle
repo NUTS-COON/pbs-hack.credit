@@ -1,0 +1,3 @@
+rootProject.name = "PSB.Cretid"
+include ':app'
+include ':psb:credit'
